@@ -1,7 +1,9 @@
 package com.CSO2.notifications_service.event;
 
+import com.CSO2.notifications_service.dto.NotificationDetails;
 import com.CSO2.notifications_service.dto.event.OrderCreatedEvent;
 import com.CSO2.notifications_service.service.NotificationService;
+import com.CSO2.notifications_service.service.channel.ChannelType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,19 +35,19 @@ public class OrderEventListener {
             context.put("items", event.getItems());
             context.put("totalAmount", event.getTotalAmount());
 
-            // Send Email
-            notificationService.sendEmail(
-                    event.getEmail(),
-                    "Order Confirmation - " + event.getOrderId(),
-                    "order-confirmation",
-                    context,
-                    event.getUserId());
+            // Build a single notification details object
+            NotificationDetails details = NotificationDetails.builder()
+                    .recipientEmail(event.getEmail())
+                    .recipientUserId(event.getUserId())
+                    .subject("Order Confirmation - " + event.getOrderId())
+                    .templateName("order-confirmation")
+                    .context(context)
+                    .inAppMessage("Your order " + event.getOrderId() + " has been placed successfully.")
+                    .inAppLink("/orders/" + event.getOrderId())
+                    .build();
 
-            // Create In-App Notification
-            notificationService.createInAppNotification(
-                    event.getUserId(),
-                    "Your order " + event.getOrderId() + " has been placed successfully.",
-                    "/orders/" + event.getOrderId());
+            // Send notification via multiple channels
+            notificationService.send(details, EnumSet.of(ChannelType.EMAIL, ChannelType.IN_APP));
 
         } catch (JsonProcessingException e) {
             log.error("Error processing order-created event", e);
