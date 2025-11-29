@@ -1,6 +1,6 @@
 package com.CSO2.notifications_service.event;
 
-import com.CSO2.notifications_service.dto.OrderCreatedEvent;
+import com.CSO2.notifications_service.dto.event.OrderCreatedEvent;
 import com.CSO2.notifications_service.service.NotificationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,4 +1,4 @@
-package com.CSO2.notifications_service.dto;
+package com.CSO2.notifications_service.dto.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
