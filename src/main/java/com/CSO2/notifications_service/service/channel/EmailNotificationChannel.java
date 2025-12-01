@@ -3,7 +3,7 @@ package com.CSO2.notifications_service.service.channel;
 import com.CSO2.notifications_service.dto.NotificationDetails;
 import com.CSO2.notifications_service.entity.NotificationLog;
 import com.CSO2.notifications_service.repository.NotificationLogRepository;
-import jakarta.mail.MessagingException;
+
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class EmailNotificationChannel implements NotificationChannel {
             javaMailSender.send(message);
 
             logNotification(details.getRecipientUserId(), "EMAIL", details.getSubject(), htmlBody, "SENT");
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             log.error("Failed to send email to {}", details.getRecipientEmail(), e);
             logNotification(details.getRecipientUserId(), "EMAIL", details.getSubject(), htmlBody, "FAILED");
         }
