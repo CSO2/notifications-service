@@ -9,7 +9,7 @@ echo "Starting smoke tests against $SERVICE_URL..."
 
 # Function to check health
 check_health() {
-    local url="$1/actuator/health"
+    local url="$1/actuator/health/liveness"
     
     # Get HTTP response code and body
     local response=$(curl -s -w "\n%{http_code}" "$url")
