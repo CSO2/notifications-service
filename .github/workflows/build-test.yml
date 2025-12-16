@@ -79,6 +79,35 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH' # Only fail on Critical and High issues
 
+      # --- NEW STEP: Run Smoke Tests ---
+      - name: Start Services and Run Smoke Tests
+        run: |
+          # Create a network
+          docker network create smoke-test-net
+
+          # Start MongoDB
+          docker run -d --name mongodb --network smoke-test-net \
+            mongo:6-jammy
+
+          # Wait a bit for MongoDB
+          sleep 10
+
+          # Start App
+          docker run -d --name app --network smoke-test-net \
+            -e SERVER_PORT=8080 \
+            -e MONGODB_URI=mongodb://mongodb:27017/CSO2_notifications_service \
+            -p 8080:8080 \
+            local-image-scan:latest
+
+          # Run smoke test script
+          chmod +x ./scripts/smoke-test.sh
+          ./scripts/smoke-test.sh http://localhost:8080
+
+          # Cleanup
+          docker stop app mongodb
+          docker rm app mongodb
+          docker network rm smoke-test-net
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
