@@ -31,5 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
-
 .env
+
+# Ignore all .md files except README.md
+*.md
+!README.md
